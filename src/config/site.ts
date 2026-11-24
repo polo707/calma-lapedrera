@@ -15,5 +15,10 @@ export const SITE_NAME = "Calma La Pedrera";
 export const CURRENCY = "USD";
 
 /** Clave de localStorage donde vive la fuente de datos compartida (web + chat + admin). */
-export const STORAGE_KEY = "calma.data.v1";
+export const STORAGE_KEY = "calma.data.v2";
 export const LANG_KEY = "calma.lang";
+
+/** Link exacto de Google Maps que pasó el cliente (botón "Abrir en Google Maps"). */
+export const MAPS_URL = "https://maps.app.goo.gl/qjqYEFNUG6VXDaFG8";
+/** Mapa embebido (sin API key). Cambiar la búsqueda por coordenadas exactas cuando las tengamos: "q=-34.59,-54.12". */
+export const MAPS_EMBED = "https://www.google.com/maps?q=Calma+La+Pedrera,+Rocha,+Uruguay&z=14&output=embed";

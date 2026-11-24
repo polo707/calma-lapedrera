@@ -8,12 +8,12 @@ import { addDays, todayISO } from "./dates";
 export function seedData(): Data {
   const t = todayISO();
   return {
-    version: 1,
+    version: 2,
     cabins: [
       { id: "agua", sedeId: "pedrera", name: "Agua", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/puerta-agua.jpg", kind: "aframe" },
       { id: "tierra", sedeId: "pedrera", name: "Tierra", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/aframe-dia-deck.jpg", kind: "aframe" },
-      { id: "aire", sedeId: "pedrera", name: "Aire", capacity: 3, rateLow: 105, rateHigh: 145, photo: "/photos/aframe-luces.jpg", kind: "aframe" },
-      { id: "fuego", sedeId: "sansebastian", name: "Fuego", capacity: 2, rateLow: 90, rateHigh: 125, photo: "/photos/aframe-entre-arboles.jpg", kind: "aframe" },
+      { id: "aire", sedeId: "sansebastian", name: "Aire", capacity: 3, rateLow: 105, rateHigh: 145, photo: "/photos/aframe-luces.jpg", kind: "aframe" },
+      { id: "fuego", sedeId: "pedrera", name: "Fuego", capacity: 2, rateLow: 90, rateHigh: 125, photo: "/photos/aframe-entre-arboles.jpg", kind: "aframe" },
       { id: "bosque", sedeId: "sansebastian", name: "Bosque", capacity: 4, rateLow: 110, rateHigh: 150, photo: "/photos/cabana-bosque.jpg", kind: "box" },
     ],
     settings: {

@@ -29,7 +29,7 @@ const localRepo: Repository = {
       const raw = window.localStorage.getItem(STORAGE_KEY);
       if (raw) {
         const parsed = JSON.parse(raw) as Data;
-        if (parsed && parsed.version === 1 && Array.isArray(parsed.cabins)) {
+        if (parsed && parsed.version === 2 && Array.isArray(parsed.cabins)) {
           cache = parsed;
           return cache;
         }

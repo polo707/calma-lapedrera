@@ -4,6 +4,9 @@ import "@fontsource/hanken-grotesk/400.css";
 import "@fontsource/hanken-grotesk/500.css";
 import "@fontsource/dm-mono/400.css";
 import "./globals.css";
+import "./styles/hero.css";
+import "./styles/sections.css";
+import "./styles/booking.css";
 import { LangProvider } from "@/i18n/LangProvider";
 
 export const metadata: Metadata = {
@@ -28,7 +31,10 @@ export const viewport: Viewport = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="es">
+    <html lang="es" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+      </head>
       <body>
         <LangProvider>{children}</LangProvider>
       </body>

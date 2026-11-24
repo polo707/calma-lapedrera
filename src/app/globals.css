@@ -499,3 +499,12 @@ h3 { font-family: var(--font-body); font-weight: 500; }
 .fab__btn:active { transform: scale(0.96); }
 .link:active, .chat__menu:active { opacity: 0.75; }
 .cell--free:active { background: var(--color-accent-2); }
+
+/* ---------- Reveal (shared) ---------- */
+.js .rv { transition: opacity 900ms var(--ease-out), transform 1100ms var(--ease-out), clip-path 1200ms var(--ease-out); transition-delay: var(--rv-delay, 0ms); }
+.js .rv--up:not(.is-in) { opacity: 0; transform: translateY(28px); }
+.js .rv--fade:not(.is-in) { opacity: 0; }
+.js .rv--scale:not(.is-in) { opacity: 0; transform: scale(0.96); }
+.js .rv--mask:not(.is-in) { clip-path: inset(100% 0 0 0); }
+.js .rv--mask { clip-path: inset(0 0 0 0); }
+@media (prefers-reduced-motion: reduce) { .js .rv:not(.is-in) { opacity: 1 !important; transform: none !important; clip-path: none !important; } }
