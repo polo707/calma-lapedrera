@@ -1,8 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
+import { AnimatePresence, motion, useDragControls, useReducedMotion } from "framer-motion";
 import { useLang } from "@/i18n/LangProvider";
+import { bx } from "@/i18n/booking-extra";
 import { actions, getData, useData } from "@/lib/store";
 import { busyNights, currentRate, isRangeFree, quote } from "@/lib/pricing";
 import { bookingMessage, makeCode, makeId, onlyDigits, waLink } from "@/lib/booking";
@@ -10,6 +12,7 @@ import { formatDate } from "@/lib/dates";
 import type { Booking, SedeId } from "@/lib/types";
 import { RangeCalendar } from "@/components/RangeCalendar";
 import { detectIntent, type Intent } from "./engine";
+import { useMediaQuery } from "./useMediaQuery";
 
 /** Los mensajes se guardan como claves + parámetros, nunca como texto: así se re-traducen al cambiar idioma. */
 type Msg = {
@@ -37,16 +40,28 @@ const CHIPS = ["sedes", "pet", "precios", "incluye", "whatsapp", "reservar"] as 
 let seq = 1;
 const nextId = () => seq++;
 
+/** Pausa de "escribiendo…" antes de cada respuesta (se omite con movimiento reducido). */
+const typingMs = (kind: string) => (kind.startsWith("flow.") ? 420 : 560);
+const EASE: [number, number, number, number] = [0.16, 1, 0.3, 1];
+const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+
 export function ChatWidget() {
   const { d, lang } = useLang();
+  const x = bx(lang);
   const data = useData();
-  const reduce = useReducedMotion();
+  const reduce = !!useReducedMotion();
+  const mobile = useMediaQuery("(max-width: 40rem)");
+  const dragControls = useDragControls();
   const [open, setOpen] = useState(false);
   const [msgs, setMsgs] = useState<Msg[]>(() => [{ id: nextId(), from: "bot", kind: "welcome" }]);
   const [step, setStep] = useState<Step>(null);
   const [flowMsgId, setFlowMsgId] = useState<number | null>(null);
   const [draft, setDraft] = useState<Draft>(EMPTY_DRAFT);
   const [input, setInput] = useState("");
+  const [typing, setTyping] = useState(0);
+  const queueAt = useRef(0);
+  const timers = useRef<number[]>([]);
+  const panelRef = useRef<HTMLDivElement>(null);
   const listRef = useRef<HTMLDivElement>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const launcherRef = useRef<HTMLButtonElement>(null);
@@ -55,7 +70,12 @@ export function ChatWidget() {
   useEffect(() => {
     const el = listRef.current;
     if (el) el.scrollTo({ top: el.scrollHeight, behavior: reduce ? "auto" : "smooth" });
-  }, [msgs, step, open, reduce]);
+  }, [msgs, step, open, reduce, typing]);
+
+  useEffect(() => {
+    const list = timers.current;
+    return () => list.forEach((id) => window.clearTimeout(id));
+  }, []);
 
   // Escape cierra; bloqueo de scroll del body en celular
   useEffect(() => {
@@ -64,6 +84,22 @@ export function ChatWidget() {
       if (e.key === "Escape") {
         setOpen(false);
         requestAnimationFrame(() => launcherRef.current?.focus());
+        return;
+      }
+      // Foco atrapado dentro del diálogo
+      if (e.key === "Tab" && panelRef.current) {
+        const items = Array.from(panelRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)).filter((el) => el.offsetParent !== null);
+        if (!items.length) return;
+        const first = items[0];
+        const last = items[items.length - 1];
+        const inside = panelRef.current.contains(document.activeElement);
+        if (e.shiftKey && (document.activeElement === first || !inside)) {
+          e.preventDefault();
+          last.focus();
+        } else if (!e.shiftKey && (document.activeElement === last || !inside)) {
+          e.preventDefault();
+          first.focus();
+        }
       }
     };
     window.addEventListener("keydown", onKey);
@@ -84,9 +120,25 @@ export function ChatWidget() {
 
   const push = (...m: Omit<Msg, "id">[]) => setMsgs((cur) => [...cur, ...m.map((x) => ({ ...x, id: nextId() }))]);
 
+  /** Agrega una respuesta del asistente. El id se reserva ya (para el flujo) y el mensaje aparece tras "escribiendo…". */
   function bot(kind: string, p?: Msg["p"]) {
     const id = nextId();
-    setMsgs((cur) => [...cur, { id, from: "bot", kind, p }]);
+    const msg: Msg = { id, from: "bot", kind, p };
+    if (reduce) {
+      setMsgs((cur) => [...cur, msg]);
+      return id;
+    }
+    const now = Date.now();
+    const at = Math.max(now, queueAt.current) + typingMs(kind);
+    queueAt.current = at;
+    setTyping((n) => n + 1);
+    const tid = window.setTimeout(() => {
+      setMsgs((cur) => [...cur, msg]);
+      setTyping((n) => Math.max(0, n - 1));
+      const i = timers.current.indexOf(tid);
+      if (i >= 0) timers.current.splice(i, 1);
+    }, at - now);
+    timers.current.push(tid);
     return id;
   }
 
@@ -100,7 +152,7 @@ export function ChatWidget() {
     setStep(null);
     setFlowMsgId(null);
     setDraft(EMPTY_DRAFT);
-    push({ from: "bot", kind: "welcome" });
+    bot("welcome");
   }
 
   function answer(intent: Intent) {
@@ -275,7 +327,12 @@ export function ChatWidget() {
                     <p className="chat__group-label">{d.sedes[sid].name}</p>
                     {data.cabins.filter((c) => c.sedeId === sid).map((c) => (
                       <button key={c.id} type="button" className="chat__option" onClick={() => pickCabin(c.id)}>
-                        <span>{c.name}</span>
+                        <span className="chat__option-main">
+                          <span className="chat__thumb" aria-hidden="true">
+                            <Image src={c.photo} alt="" width={80} height={80} sizes="40px" />
+                          </span>
+                          <span>{c.name}</span>
+                        </span>
                         <span className="num">USD {currentRate(c, s)} {d.cabins.perNight}</span>
                       </button>
                     ))}
@@ -406,7 +463,32 @@ export function ChatWidget() {
 
   const panelAnim = reduce
     ? { initial: { opacity: 0 }, animate: { opacity: 1 }, exit: { opacity: 0 } }
-    : { initial: { opacity: 0, y: 40 }, animate: { opacity: 1, y: 0 }, exit: { opacity: 0, y: 40 } };
+    : mobile
+      ? { initial: { y: "100%" }, animate: { y: 0 }, exit: { y: "100%" } }
+      : { initial: { opacity: 0, y: 18, scale: 0.97 }, animate: { opacity: 1, y: 0, scale: 1 }, exit: { opacity: 0, y: 14, scale: 0.98 } };
+
+  const bubbleAnim = (from: Msg["from"]) =>
+    reduce
+      ? { initial: false as const }
+      : {
+          initial: { opacity: 0, y: 10, scale: 0.97, x: from === "user" ? 8 : -8 },
+          animate: { opacity: 1, y: 0, scale: 1, x: 0 },
+          transition: { duration: 0.34, ease: EASE },
+        };
+
+  // Deslizar hacia abajo para cerrar (solo la hoja del celular; se arrastra desde la cabecera)
+  const dragProps = mobile
+    ? {
+        drag: "y" as const,
+        dragControls,
+        dragListener: false,
+        dragConstraints: { top: 0, bottom: 0 },
+        dragElastic: { top: 0, bottom: 0.85 },
+        onDragEnd: (_: unknown, info: { offset: { y: number }; velocity: { y: number } }) => {
+          if (info.offset.y > 110 || info.velocity.y > 650) close();
+        },
+      }
+    : {};
 
   return (
     <>
@@ -424,21 +506,36 @@ export function ChatWidget() {
       <AnimatePresence>
         {open && (
           <>
-            <motion.div className="chat__backdrop" onClick={close} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.2 }} aria-hidden="true" />
+            <motion.div className="chat__backdrop" onClick={close} initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.24 }} aria-hidden="true" />
             <motion.div
+              ref={panelRef}
               id="calma-chat"
-              className="chat"
+              className="chat chat--lux"
               role="dialog"
               aria-modal="true"
               aria-labelledby="chat-title"
               {...panelAnim}
-              transition={{ duration: reduce ? 0.15 : 0.38, ease: [0.16, 1, 0.3, 1] }}
+              {...dragProps}
+              transition={{ duration: reduce ? 0.15 : mobile ? 0.44 : 0.36, ease: mobile ? [0.32, 0.72, 0, 1] : EASE }}
             >
-              <div className="chat__head">
-                <span className="chat__logo" aria-hidden="true">C</span>
+              <div
+                className="chat__head"
+                onPointerDown={(e) => {
+                  if (mobile && !(e.target as HTMLElement).closest("button")) dragControls.start(e);
+                }}
+              >
+                {mobile && <span className="chat__handle" aria-hidden="true" />}
+                <span className="chat__logo" aria-hidden="true">
+                  <span className="chat__logo-c">C</span>
+                  <span className="chat__online" />
+                </span>
                 <div className="chat__titles">
                   <p className="chat__title" id="chat-title">{d.chat.title}</p>
-                  <p className="chat__subtitle">{d.chat.subtitle}</p>
+                  <p className="chat__subtitle">
+                    <span className="chat__status">{x.chat.online}</span>
+                    <span aria-hidden="true"> · </span>
+                    {d.chat.subtitle}
+                  </p>
                 </div>
                 <button ref={closeRef} type="button" className="chat__close" onClick={close} aria-label={d.chat.close}>
                   <svg width="20" height="20" viewBox="0 0 20 20" aria-hidden="true"><path d="m5 5 10 10M15 5 5 15" stroke="currentColor" strokeWidth="1.6" /></svg>
@@ -446,18 +543,42 @@ export function ChatWidget() {
               </div>
 
               <div className="chat__body" ref={listRef} aria-live="polite">
-                {msgs.map((m) => (
-                  <div key={m.id} className={`bubble bubble--${m.from}`}>
-                    {m.from === "bot" ? renderBot(m) : renderUser(m)}
-                  </div>
-                ))}
-                {showChips && (
-                  <div className="chips">
-                    {CHIPS.map((c) => (
-                      <button key={c} type="button" className="chip" onClick={() => onChip(c)}>{d.chat.chips[c]}</button>
-                    ))}
-                  </div>
-                )}
+                <AnimatePresence initial={false}>
+                  {msgs.map((m) => (
+                    <motion.div key={m.id} className={`bubble bubble--${m.from}`} {...bubbleAnim(m.from)}>
+                      {m.from === "bot" ? renderBot(m) : renderUser(m)}
+                    </motion.div>
+                  ))}
+                  {typing > 0 && (
+                    <motion.div
+                      key="typing"
+                      className="bubble bubble--bot typing"
+                      aria-hidden="true"
+                      initial={{ opacity: 0, y: 6 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, transition: { duration: 0.12 } }}
+                      transition={{ duration: 0.22, ease: EASE }}
+                    >
+                      <span className="typing__dot" />
+                      <span className="typing__dot" />
+                      <span className="typing__dot" />
+                    </motion.div>
+                  )}
+                  {showChips && (
+                    <motion.div
+                      key="chips"
+                      className="chips"
+                      initial={reduce ? false : { opacity: 0, y: 8 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, transition: { duration: 0.12 } }}
+                      transition={{ duration: 0.3, ease: EASE, delay: 0.05 }}
+                    >
+                      {CHIPS.map((c) => (
+                        <button key={c} type="button" className="chip" onClick={() => onChip(c)}>{d.chat.chips[c]}</button>
+                      ))}
+                    </motion.div>
+                  )}
+                </AnimatePresence>
               </div>
 
               <div className="chat__foot">

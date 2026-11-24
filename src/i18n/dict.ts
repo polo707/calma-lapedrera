@@ -33,7 +33,7 @@ const es = {
   cabinWord: "Cabaña",
   cabins: {
     title: "Las cabañas",
-    lead: "Madera, vidrio y bosque. Pensadas para dos, con todo para cocinar y quedarse.",
+    lead: "Madera, vidrio y bosque. Pensadas para parejas, con todo para cocinar y quedarse.",
     capacity: (n: number) => `Hasta ${n} ${n === 1 ? "huésped" : "huéspedes"}`,
     perNight: "por noche",
     low: "Temporada baja",
@@ -248,7 +248,7 @@ const en: Dict = {
   cabinWord: "Cabin",
   cabins: {
     title: "The cabins",
-    lead: "Wood, glass and forest. Made for two, with everything to cook and stay a while.",
+    lead: "Wood, glass and forest. Made for couples, with everything to cook and stay a while.",
     capacity: (n: number) => `Up to ${n} ${n === 1 ? "guest" : "guests"}`,
     perNight: "per night",
     low: "Low season",
@@ -454,7 +454,7 @@ const pt: Dict = {
   cabinWord: "Cabana",
   cabins: {
     title: "As cabanas",
-    lead: "Madeira, vidro e mata. Pensadas para dois, com tudo para cozinhar e ficar.",
+    lead: "Madeira, vidro e mata. Pensadas para casais, com tudo para cozinhar e ficar.",
     capacity: (n: number) => `Até ${n} ${n === 1 ? "hóspede" : "hóspedes"}`,
     perNight: "por noite",
     low: "Baixa temporada",
