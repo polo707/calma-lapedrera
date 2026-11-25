@@ -1,6 +1,5 @@
 import { Availability } from "@/components/Availability";
 import { Pets, Location, Footer } from "@/components/Sections";
-import { ChatWidget } from "@/chat/ChatWidget";
 import { Loader } from "@/cine/Loader";
 import { Stage } from "@/cine/Stage";
 import { SiteHeader } from "@/cine/SiteHeader";
@@ -10,6 +9,7 @@ import { Passage } from "@/cine/Passage";
 import { Gallery } from "@/cine/Gallery";
 import { Space } from "@/cine/Space";
 import { BookingPanel } from "@/cine/BookingPanel";
+import { LazyChat } from "@/cine/LazyChat";
 
 export default function Home() {
   return (
@@ -31,7 +31,7 @@ export default function Home() {
       </main>
       <div data-tone="light" className="paper paper--footer"><Footer /></div>
       <BookingPanel />
-      <ChatWidget />
+      <LazyChat />
     </>
   );
 }

@@ -1,8 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import { useRef } from "react";
-import { motion, useScroll, useTransform } from "framer-motion";
 import { useLang } from "@/i18n/LangProvider";
 import { sectionsExtra } from "@/i18n/sections-extra";
 import { useData } from "@/lib/store";
@@ -22,9 +20,6 @@ export function Pets() {
   const { settings } = useData();
   const rules = d.pet.rules(settings.maxPets, settings.petFee);
 
-  const frame = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: frame, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
 
   return (
     <section className="section section--tint sx-pets" id="mascotas" aria-labelledby="pet-title">
@@ -38,11 +33,11 @@ export function Pets() {
           </Reveal>
         </div>
 
-        <div ref={frame} className="sx-pets__media">
+        <div className="sx-pets__media">
           <Reveal as="figure" variant="mask" className="sx-pets__frame">
-            <motion.div className="sx-pets__zoom plx" style={{ scale }}>
+            <div className="sx-pets__zoom">
               <Image src={fotoPerro} alt={x.alt} placeholder="blur" fill sizes="(max-width: 60rem) 100vw, 45vw" />
-            </motion.div>
+            </div>
           </Reveal>
         </div>
 

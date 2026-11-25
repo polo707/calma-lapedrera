@@ -22,8 +22,10 @@ html.panel-open .fab { opacity: 0; pointer-events: none; }
 
 /* ---------- Loader ---------- */
 .loader { display: none; }
+.js .loader { display: none; }
+@media (min-width: 821px) and (pointer: fine) { .js .loader { display: grid; } }
 .js .loader {
-  position: fixed; inset: 0; z-index: 1000; display: grid; place-content: center; justify-items: center; gap: 18px;
+  position: fixed; inset: 0; z-index: 1000; place-content: center; justify-items: center; gap: 18px;
   background: var(--mist); color: var(--pine);
   transition: opacity 1s var(--ease), visibility 1s;
 }
@@ -127,7 +129,7 @@ html.panel-open .fab { opacity: 0; pointer-events: none; }
 .copy-frame--center .copy-frame__inner { padding-bottom: 0; display: grid; justify-items: center; }
 
 /* entrada de los textos cuando el capítulo se activa */
-.js .chapter .copy-frame__inner > * { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 1.1s var(--ease), transform 1.3s var(--ease); }
+.js .chapter:not(.chapter--hero) .copy-frame__inner > * { opacity: 0; transform: translate3d(0, 26px, 0); transition: opacity 1.1s var(--ease), transform 1.3s var(--ease); }
 .js .chapter.is-active .copy-frame__inner > * { opacity: 1; transform: none; }
 .js .chapter.is-active .copy-frame__inner > :nth-child(2) { transition-delay: .08s; }
 .js .chapter.is-active .copy-frame__inner > :nth-child(3) { transition-delay: .16s; }
@@ -192,7 +194,12 @@ html.panel-open .fab { opacity: 0; pointer-events: none; }
 .hero-copy__sub { margin-top: 26px; max-width: 42ch; font: 400 clamp(15px, .3vw + 14px, 17px)/1.65 var(--font-body); color: rgb(245 240 228 / .82); }
 .hero-copy__actions { margin-top: 34px; display: flex; flex-wrap: wrap; align-items: center; gap: 18px 30px; }
 html.is-loading .chapter--hero * { animation-play-state: paused !important; }
-.js .chapter--hero .copy-frame__inner > * { transition-delay: .2s; }
+/* El hero entra con CSS desde el primer pintado (no espera a JavaScript) */
+.chapter--hero .copy-frame__inner > * { animation: hero-in 1.2s var(--ease) both; }
+.chapter--hero .copy-frame__inner > :nth-child(2) { animation-delay: .08s; }
+.chapter--hero .copy-frame__inner > :nth-child(3) { animation-delay: .16s; }
+@keyframes hero-in { from { opacity: .02; transform: translate3d(0, 22px, 0); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) { .chapter--hero .copy-frame__inner > * { animation: none; } }
 
 /* ---------- Reserve button (borde cónico + orbe) ---------- */
 .reserve-button {
@@ -208,7 +215,10 @@ html.is-loading .chapter--hero * { animation-play-state: paused !important; }
   background: conic-gradient(from var(--angle), rgb(245 240 228 / .14) 0deg, rgb(245 240 228 / .95) 60deg, rgb(143 162 140 / .7) 120deg, rgb(245 240 228 / .14) 180deg, rgb(245 240 228 / .14) 360deg);
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box exclude, linear-gradient(#000 0 0);
-  animation: angle-spin 5.5s linear infinite;
+}
+/* El borde gira solo en escritorio y solo en el botón del capítulo visible (animar --angle usa el hilo principal) */
+@media (hover: hover) and (pointer: fine) {
+  .chapter.is-active .reserve-button::before, .passage.is-active .reserve-button::before, .reserve-button:hover::before { animation: angle-spin 5.5s linear infinite; }
 }
 @keyframes angle-spin { to { --angle: 360deg; } }
 .reserve-button:hover { transform: scale(1.025); background-color: rgb(19 32 29 / .5); box-shadow: inset 0 0 0 1px rgb(245 240 228 / .28); }
@@ -269,7 +279,7 @@ html.is-loading .chapter--hero * { animation-play-state: paused !important; }
 /* ---------- Scroll cue ---------- */
 .scroll-cue { position: fixed; left: 50%; bottom: 26px; z-index: 20; display: grid; justify-items: center; gap: 10px; color: var(--ivory); transform: translateX(-50%); transition: opacity .8s var(--ease), transform .8s var(--ease); pointer-events: none; }
 .scroll-cue span { font: 600 10px/1 var(--font-body); letter-spacing: .3em; text-transform: uppercase; opacity: .8; }
-.scroll-cue i { display: block; width: 1px; height: 46px; background: linear-gradient(var(--ivory), transparent); transform-origin: top; animation: cue 2.4s var(--ease) infinite; }
+.scroll-cue i { will-change: transform, opacity; display: block; width: 1px; height: 46px; background: linear-gradient(var(--ivory), transparent); transform-origin: top; animation: cue 2.4s var(--ease) infinite; }
 .scroll-cue.is-hidden { opacity: 0; transform: translate(-50%, 12px); }
 @keyframes cue { 0% { transform: scaleY(0); opacity: 1; } 60% { transform: scaleY(1); opacity: 1; } 100% { transform: scaleY(1); opacity: 0; } }
 
@@ -378,6 +388,7 @@ html.is-loading .chapter--hero * { animation-play-state: paused !important; }
   .copy-frame__inner { padding-bottom: calc(9 * var(--vh)); max-width: calc(100% - 64px); }
   .copy-frame--center .copy-frame__inner { max-width: 100%; }
   .chapter-rail { display: none; }
+  .scroll-cue { display: none; }
   .site-header__place { display: none; }
   .site-header { gap: 12px; }
   .gallery-track { height: calc(64 * var(--vh)); overflow-x: auto; scroll-snap-type: x mandatory; margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none; }
@@ -392,7 +403,6 @@ html.is-loading .chapter--hero * { animation-play-state: paused !important; }
 }
 @media (max-width: 480px) {
   .scene-layer img { object-position: var(--pos-sm); }
-  .scroll-cue { display: none; }
   .site-header__name { font-size: 21px; }
   .site-header__lang button { min-width: 30px; height: 32px; }
   .reserve-button--sm { padding-left: 14px; letter-spacing: .1em; }

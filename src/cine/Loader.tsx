@@ -5,10 +5,12 @@ import { useLang } from "@/i18n/LangProvider";
 import { cine } from "@/i18n/cine";
 import { refreshCine } from "./scroll";
 
+const DESKTOP = "(min-width: 821px) and (pointer: fine)";
+
 /**
- * Pantalla de carga: sello "C", barra y contador 00–100 atados a la carga real
- * de las imágenes del escenario y las fuentes. Sin JS no se muestra (solo bajo html.js).
- * Tope de seguridad: 5 s.
+ * Pantalla de carga (solo escritorio): sello "C", barra y contador 00–100 atados a la carga
+ * de la primera escena y las fuentes. Tope de 1,4 s. En celulares no se muestra: el contenido
+ * aparece directo, que es lo que más importa en conexiones móviles.
  */
 export function Loader() {
   const { lang } = useLang();
@@ -18,41 +20,43 @@ export function Loader() {
   const [gone, setGone] = useState(false);
 
   useEffect(() => {
-    const imgs = Array.from(document.querySelectorAll<HTMLImageElement>(".stage img"));
-    const total = imgs.length + 1; // + fuentes
-    let loaded = 0;
+    if (!window.matchMedia(DESKTOP).matches) {
+      setDone(true);
+      setGone(true);
+      return;
+    }
+    document.documentElement.classList.add("is-loading");
     let finished = false;
-    const bump = () => {
-      loaded += 1;
-      setPct(Math.min(100, Math.round((loaded / total) * 100)));
-      if (loaded >= total) finish();
-    };
     const finish = () => {
       if (finished) return;
       finished = true;
       setPct(100);
-      window.setTimeout(() => setDone(true), 350);
+      document.documentElement.classList.remove("is-loading");
+      window.setTimeout(() => setDone(true), 200);
       window.setTimeout(() => {
         setGone(true);
         refreshCine();
-      }, 1400);
+      }, 1200);
     };
-    imgs.forEach((img) => {
-      if (img.complete && img.naturalWidth > 0) bump();
-      else {
-        img.addEventListener("load", bump, { once: true });
-        img.addEventListener("error", bump, { once: true });
-      }
-    });
+    const img = document.querySelector<HTMLImageElement>('.scene-layer[data-scene="0"] .base img');
+    let loaded = 0;
+    const bump = () => {
+      loaded += 1;
+      setPct(loaded === 1 ? 60 : 100);
+      if (loaded >= 2) finish();
+    };
+    if (!img || (img.complete && img.naturalWidth > 0)) bump();
+    else {
+      img.addEventListener("load", bump, { once: true });
+      img.addEventListener("error", bump, { once: true });
+    }
     document.fonts?.ready.then(bump).catch(bump);
-    const safety = window.setTimeout(finish, 5000);
-    return () => window.clearTimeout(safety);
+    const safety = window.setTimeout(finish, 1400);
+    return () => {
+      window.clearTimeout(safety);
+      document.documentElement.classList.remove("is-loading");
+    };
   }, []);
-
-  useEffect(() => {
-    document.documentElement.classList.toggle("is-loading", !done);
-    return () => document.documentElement.classList.remove("is-loading");
-  }, [done]);
 
   if (gone) return null;
   return (

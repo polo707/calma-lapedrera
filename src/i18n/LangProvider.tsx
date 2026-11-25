@@ -16,9 +16,8 @@ function detect(): Lang {
   } catch {
     /* ignore */
   }
-  const nav = (navigator.language || "es").slice(0, 2);
-  if (nav === "pt") return "pt";
-  if (nav === "en") return "en";
+  // Sin autodetección por idioma del navegador: cambiar el texto después de cargar
+  // retrasa el pintado principal (LCP). Se respeta la elección guardada del visitante.
   return "es";
 }
 

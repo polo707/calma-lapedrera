@@ -3,9 +3,13 @@
 import { useEffect, useRef, useState } from "react";
 import { useLang } from "@/i18n/LangProvider";
 import { cine } from "@/i18n/cine";
-import { BookingSection } from "@/components/BookingSection";
+import dynamic from "next/dynamic";
+import { PREFILL_EVENT, type Prefill } from "@/components/Availability";
 import { getLenis } from "@/components/motion/SmoothScroll";
 import { BOOK_OPEN } from "./ReserveButton";
+
+// El formulario se descarga recién cuando hace falta (al abrir el panel o al tocar una noche libre).
+const BookingSection = dynamic(() => import("@/components/BookingSection").then((m) => m.BookingSection), { ssr: false });
 
 /**
  * Panel de reserva lateral (diálogo fijo, z 60–61). Siempre montado (oculto con inert)
@@ -16,11 +20,21 @@ export function BookingPanel() {
   const { lang } = useLang();
   const c = cine(lang);
   const [open, setOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
+  const pending = useRef<Prefill | null>(null);
   const closeRef = useRef<HTMLButtonElement>(null);
   const lastFocus = useRef<HTMLElement | null>(null);
 
   useEffect(() => {
+    const onPrefill = (e: Event) => {
+      setMounted((m) => {
+        if (!m) pending.current = (e as CustomEvent<Prefill>).detail;
+        return true;
+      });
+    };
+    window.addEventListener(PREFILL_EVENT, onPrefill);
     const onOpen = () => {
+      setMounted(true);
       lastFocus.current = document.activeElement as HTMLElement | null;
       setOpen(true);
     };
@@ -36,6 +50,7 @@ export function BookingPanel() {
     if (window.location.hash === "#reservar") onOpen();
     return () => {
       window.removeEventListener(BOOK_OPEN, onOpen);
+      window.removeEventListener(PREFILL_EVENT, onPrefill);
       window.removeEventListener("click", onClick, true);
     };
   }, []);
@@ -60,6 +75,22 @@ export function BookingPanel() {
     };
   }, [open]);
 
+  // reenviar el prellenado cuando el formulario ya está montado y escuchando
+  useEffect(() => {
+    if (!mounted || !pending.current) return;
+    const detail = pending.current;
+    let tries = 0;
+    const iv = window.setInterval(() => {
+      tries += 1;
+      if (document.getElementById("reservar") || tries > 40) {
+        window.clearInterval(iv);
+        pending.current = null;
+        window.setTimeout(() => window.dispatchEvent(new CustomEvent<Prefill>(PREFILL_EVENT, { detail })), 50);
+      }
+    }, 50);
+    return () => window.clearInterval(iv);
+  }, [mounted]);
+
   function close() {
     setOpen(false);
     window.setTimeout(() => lastFocus.current?.focus?.(), 50);
@@ -83,7 +114,7 @@ export function BookingPanel() {
           </button>
         </div>
         <div className="bpanel__body">
-          <BookingSection />
+          {mounted && <BookingSection />}
         </div>
       </div>
     </>

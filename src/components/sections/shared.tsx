@@ -1,8 +1,7 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { StaticImageData } from "next/image";
-import { motion, useScroll, useTransform } from "framer-motion";
 import { useData } from "@/lib/store";
 import { currentRate } from "@/lib/pricing";
 import { useMounted } from "@/lib/useMounted";
@@ -73,14 +72,41 @@ type ParallaxProps = {
  * Con prefers-reduced-motion el CSS anula la transformación (.plx).
  */
 export function Parallax({ children, className = "", distance = 40 }: ParallaxProps) {
+  // Parallax liviano sin librerías: una sola lectura por frame, solo mientras está en pantalla.
   const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "end start"] });
-  const y = useTransform(scrollYProgress, [0, 1], [distance, -distance]);
+  const inner = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    const target = inner.current;
+    if (!el || !target || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    let raf = 0;
+    let visible = false;
+    const tick = () => {
+      raf = 0;
+      const r = el.getBoundingClientRect();
+      const p = Math.min(1, Math.max(0, (window.innerHeight - r.top) / (window.innerHeight + r.height)));
+      target.style.transform = `translate3d(0, ${(distance - p * distance * 2).toFixed(1)}px, 0)`;
+    };
+    const onScroll = () => {
+      if (visible && !raf) raf = requestAnimationFrame(tick);
+    };
+    const io = new IntersectionObserver(([e]) => {
+      visible = e.isIntersecting;
+      onScroll();
+    });
+    io.observe(el);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => {
+      io.disconnect();
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, [distance]);
   return (
     <div ref={ref} className={className}>
-      <motion.div className="plx" style={{ y }}>
+      <div ref={inner} className="plx">
         {children}
-      </motion.div>
+      </div>
     </div>
   );
 }
