@@ -16,7 +16,7 @@ export function Stage() {
   const onStage = active < CINE_CHAPTERS;
 
   return (
-    <div className="stage" aria-hidden="true">
+    <div className={`stage${onStage ? "" : " is-covered"}`} aria-hidden="true">
       <div className="stage__scenes">
         {SCENES.map((s, i) => (
           <div

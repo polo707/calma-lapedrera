@@ -70,7 +70,8 @@ export function scrollToHash(hash: string): boolean {
 
 export function SmoothScroll() {
   useEffect(() => {
-    const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+    // En táctil (celular/tablet) el scroll es 100% nativo: Lenis no se monta.
+    const mq = window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse), (hover: none)");
 
     const start = () => {
       if (lenis || mq.matches) return;

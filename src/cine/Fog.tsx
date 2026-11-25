@@ -15,7 +15,8 @@ export function Fog({ running }: { running: boolean }) {
   useEffect(() => {
     const canvas = ref.current;
     if (!canvas) return;
-    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+    // En celulares/táctil no se monta: el resto del escenario ya da la atmósfera y el scroll queda fluido.
+    if (window.matchMedia("(prefers-reduced-motion: reduce), (pointer: coarse), (max-width: 820px)").matches) return;
     let disposed = false;
     let cleanup = () => {};
 

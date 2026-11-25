@@ -4,9 +4,10 @@ import { useSyncExternalStore } from "react";
 
 /**
  * Motor de scroll de la experiencia cinemática.
- * - Detecta el capítulo activo (elementos con [data-chapter]) y su progreso local.
- * - Aplica el parallax directamente al DOM (sin re-render de React por frame).
- * - Expone el capítulo activo a React para el riel, la cabecera y el escenario.
+ * - Detecta el capítulo activo (elementos con [data-chapter]).
+ * - Aplica el parallax directamente al DOM, sin re-render de React por frame.
+ * - Rendimiento: primero LEE todas las medidas y después ESCRIBE (sin layout thrashing),
+ *   solo anima las capas cercanas a la vista y deja de trabajar en las secciones de papel.
  */
 
 type State = { active: number; scrolled: boolean; tone: "dark" | "light" };
@@ -16,6 +17,24 @@ const listeners = new Set<() => void>();
 let started = false;
 let raf = 0;
 let reduce = false;
+let lite = false; // táctil / pantallas chicas: menos trabajo por frame
+
+let chapters: HTMLElement[] = [];
+let layers: { scene: number; base: HTMLElement | null; depth: HTMLElement | null }[] = [];
+let frames: { el: HTMLElement; chapter: HTMLElement }[] = [];
+
+function collect() {
+  chapters = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
+  layers = Array.from(document.querySelectorAll<HTMLElement>(".scene-layer")).map((el) => ({
+    scene: Number(el.dataset.scene),
+    base: el.querySelector<HTMLElement>(".base"),
+    depth: el.querySelector<HTMLElement>(".depth"),
+  }));
+  frames = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter] .copy-frame__inner")).map((el) => ({
+    el,
+    chapter: el.closest<HTMLElement>("[data-chapter]")!,
+  }));
+}
 
 function emit(next: State) {
   if (next.active === state.active && next.scrolled === state.scrolled && next.tone === state.tone) return;
@@ -27,50 +46,51 @@ const clamp = (v: number, a: number, b: number) => Math.min(b, Math.max(a, v));
 
 function frame() {
   raf = 0;
+  if (!chapters.length || !chapters[0].isConnected) collect();
   const y = window.scrollY;
   const vh = window.innerHeight;
-  const chapters = Array.from(document.querySelectorAll<HTMLElement>("[data-chapter]"));
+
+  // ---- LECTURA (una sola pasada de medidas) ----
+  const tops = chapters.map((el) => el.getBoundingClientRect());
+
   let active = 0;
   let tone: "dark" | "light" = "dark";
-  for (const el of chapters) {
-    const top = el.getBoundingClientRect().top;
-    if (top <= vh * 0.5) {
+  chapters.forEach((el, i) => {
+    if (tops[i].top <= vh * 0.5) {
       active = Number(el.dataset.chapter);
       tone = el.dataset.tone === "light" ? "light" : "dark";
     }
-  }
-
-  // Parallax de las capas del escenario (base y profundidad con multiplicadores distintos)
-  if (!reduce) {
-    const layers = document.querySelectorAll<HTMLElement>(".scene-layer");
-    layers.forEach((layer) => {
-      const i = Number(layer.dataset.scene);
-      const ch = document.querySelector<HTMLElement>(`[data-chapter="${i}"]`);
-      if (!ch) return;
-      const r = ch.getBoundingClientRect();
-      const local = clamp(-r.top / Math.max(1, r.height - vh), -0.6, 1.4);
-      const base = layer.querySelector<HTMLElement>(".base");
-      const depth = layer.querySelector<HTMLElement>(".depth");
-      if (base) base.style.transform = `translate3d(0, ${(-local * 4).toFixed(3)}vh, 0) scale(${(1.08 - local * 0.05).toFixed(4)})`;
-      if (depth) depth.style.transform = `translate3d(${(-local * 1.6).toFixed(3)}vw, ${(-local * 11).toFixed(3)}vh, 0) scale(${(1.14 - local * 0.07).toFixed(4)})`;
-    });
-    // copy frames: suave salida hacia arriba
-    document.querySelectorAll<HTMLElement>("[data-chapter] .copy-frame__inner").forEach((el) => {
-      const ch = el.closest<HTMLElement>("[data-chapter]")!;
-      const r = ch.getBoundingClientRect();
-      const out = clamp((-r.top - (r.height - vh) * 0.72) / (vh * 0.5), 0, 1);
-      el.style.opacity = String(1 - out);
-      el.style.transform = `translate3d(0, ${(-out * 6).toFixed(2)}vh, 0)`;
-    });
-  }
-
-  // clases de estado
-  chapters.forEach((el) => {
-    const on = Number(el.dataset.chapter) === active;
-    el.classList.toggle("is-active", on);
-    if (on) el.classList.add("was-active");
   });
-  document.documentElement.style.setProperty("--cine-active", String(active));
+  const rectOf = (ch: HTMLElement) => tops[chapters.indexOf(ch)];
+
+  // ---- ESCRITURA ----
+  if (!reduce) {
+    for (const l of layers) {
+      if (Math.abs(l.scene - active) > 1) continue; // solo la escena activa y sus vecinas
+      const idx = chapters.findIndex((c) => Number(c.dataset.chapter) === l.scene);
+      if (idx < 0) continue;
+      const r = tops[idx];
+      const local = clamp(-r.top / Math.max(1, r.height - vh), -0.6, 1.4);
+      if (l.base) l.base.style.transform = `translate3d(0, ${(-local * 4).toFixed(2)}vh, 0) scale(${(1.08 - local * 0.05).toFixed(4)})`;
+      if (l.depth && !lite) l.depth.style.transform = `translate3d(${(-local * 1.6).toFixed(2)}vw, ${(-local * 11).toFixed(2)}vh, 0) scale(${(1.14 - local * 0.07).toFixed(4)})`;
+    }
+    for (const f of frames) {
+      const r = rectOf(f.chapter);
+      if (!r || r.bottom < -vh || r.top > vh * 2) continue;
+      const out = clamp((-r.top - (r.height - vh) * 0.72) / (vh * 0.5), 0, 1);
+      f.el.style.opacity = String(1 - out);
+      f.el.style.transform = out > 0 ? `translate3d(0, ${(-out * 6).toFixed(2)}vh, 0)` : "";
+    }
+  }
+
+  // clases de estado: solo cuando cambia el capítulo
+  if (active !== state.active || !chapters.some((el) => el.classList.contains("is-active"))) {
+    for (const el of chapters) {
+      const on = Number(el.dataset.chapter) === active;
+      el.classList.toggle("is-active", on);
+      if (on) el.classList.add("was-active");
+    }
+  }
   emit({ active, scrolled: y > 24, tone });
 }
 
@@ -82,13 +102,23 @@ function start() {
   if (started || typeof window === "undefined") return;
   started = true;
   const mq = window.matchMedia("(prefers-reduced-motion: reduce)");
+  const lq = window.matchMedia("(pointer: coarse), (max-width: 820px)");
   reduce = mq.matches;
+  lite = lq.matches;
   mq.addEventListener("change", () => {
     reduce = mq.matches;
     schedule();
   });
+  lq.addEventListener("change", () => {
+    lite = lq.matches;
+    schedule();
+  });
   window.addEventListener("scroll", schedule, { passive: true });
-  window.addEventListener("resize", schedule);
+  window.addEventListener("resize", () => {
+    collect();
+    schedule();
+  });
+  collect();
   schedule();
 }
 
@@ -106,5 +136,6 @@ export function useCine(): State {
 
 /** Recalcula (p. ej. después de que el loader libera el scroll). */
 export function refreshCine() {
+  collect();
   schedule();
 }
