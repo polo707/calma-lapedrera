@@ -99,7 +99,7 @@ html:not(.js) .sx-sedes__panel + .sx-sedes__panel { margin-top: var(--space-2xl)
 @media (min-width: 60rem) {
   .sx-sedes__grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 0 calc(var(--gap-columns) * 2.5); align-items: start; }
   .sx-sedes__side { display: block; padding-top: var(--space-md); }
-  .sx-sedes__media { aspect-ratio: 4 / 5; max-height: min(82svh, 860px); width: 100%; }
+  .sx-sedes__media { aspect-ratio: 4 / 5; max-height: min(calc(82 * var(--vh)), 860px); width: 100%; }
   .sx-sedes__apart { margin-top: var(--space-md); }
   .sx-sedes__name { margin-top: var(--space-2xl); }
 }
@@ -165,7 +165,7 @@ html:not(.js) .sx-sedes__panel + .sx-sedes__panel { margin-top: var(--space-2xl)
   .sx-show__meta { display: grid; justify-items: end; gap: var(--space-3xs); font-size: var(--text-sm); text-align: right; }
   .sx-show__sede { color: var(--color-muted); }
   .sx-show__stage { position: sticky; top: var(--sx-sticky); }
-  .sx-show__frame { aspect-ratio: 6 / 5; max-height: 66svh; width: 100%; }
+  .sx-show__frame { aspect-ratio: 6 / 5; max-height: calc(66 * var(--vh)); width: 100%; }
   .sx-spec__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 }
 
@@ -285,7 +285,7 @@ html:not(.js) .sx-sedes__panel + .sx-sedes__panel { margin-top: var(--space-2xl)
     grid-template-rows: auto 1fr; gap: var(--space-2xl) 0;
   }
   .sx-pets__media { align-self: start; position: sticky; top: var(--sx-sticky); }
-  .sx-pets__frame { max-height: calc(100svh - var(--sx-sticky) - var(--space-xl)); width: 100%; }
+  .sx-pets__frame { max-height: calc(calc(100 * var(--vh)) - var(--sx-sticky) - var(--space-xl)); width: 100%; }
 }
 
 /* ---------- Cómo llegar: mapa + sedes + FAQ ---------- */

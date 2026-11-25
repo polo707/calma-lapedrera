@@ -32,6 +32,9 @@ export const metadata: Metadata = {
   },
 };
 
+/** Clase "js" + alto de pantalla fijo en px (--vh), recalculado solo si cambia el ancho (rotación). */
+const VH_SCRIPT = `(function(){var d=document.documentElement;d.classList.add('js');var w=innerWidth;function set(){d.style.setProperty('--vh',(innerHeight/100)+'px')}set();addEventListener('resize',function(){if(Math.abs(innerWidth-w)>40){w=innerWidth;set()}});addEventListener('orientationchange',function(){setTimeout(function(){w=innerWidth;set()},300)})})();`;
+
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
@@ -42,7 +45,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
   return (
     <html lang="es" suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: "document.documentElement.classList.add('js')" }} />
+        <script dangerouslySetInnerHTML={{ __html: VH_SCRIPT }} />
       </head>
       <body>
         <LangProvider>{children}</LangProvider>

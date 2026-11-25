@@ -18,6 +18,9 @@ let started = false;
 let raf = 0;
 let reduce = false;
 let lite = false; // táctil / pantallas chicas: menos trabajo por frame
+/** Alto de pantalla fijo (igual que --vh): no cambia cuando las barras del navegador se esconden. */
+let fixedVh = 0;
+let lastW = 0;
 
 let chapters: HTMLElement[] = [];
 let layers: { scene: number; base: HTMLElement | null; depth: HTMLElement | null }[] = [];
@@ -48,7 +51,11 @@ function frame() {
   raf = 0;
   if (!chapters.length || !chapters[0].isConnected) collect();
   const y = window.scrollY;
-  const vh = window.innerHeight;
+  if (!fixedVh) {
+    fixedVh = window.innerHeight;
+    lastW = window.innerWidth;
+  }
+  const vh = fixedVh;
 
   // ---- LECTURA (una sola pasada de medidas) ----
   const tops = chapters.map((el) => el.getBoundingClientRect());
@@ -115,7 +122,12 @@ function start() {
   });
   window.addEventListener("scroll", schedule, { passive: true });
   window.addEventListener("resize", () => {
-    collect();
+    // solo recalculamos el alto si cambió el ancho (rotación), no por las barras del navegador
+    if (Math.abs(window.innerWidth - lastW) > 40) {
+      lastW = window.innerWidth;
+      fixedVh = window.innerHeight;
+      collect();
+    }
     schedule();
   });
   collect();
