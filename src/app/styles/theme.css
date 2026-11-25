@@ -1,0 +1,43 @@
+/* Calma × "retiro de montaña": paleta marfil / pino / musgo y tipografías Newsreader + Manrope + WindSong.
+   Re-mapea los tokens del sistema para que la reserva, el chat, el admin y las secciones de papel hereden el nuevo look. */
+:root {
+  --ivory: #f5f0e4;
+  --ivory-2: #ece6d7;
+  --ivory-3: #ddd5c2;
+  --pine: #13201d;
+  --pine-2: #1d2e2a;
+  --pine-3: #2b403a;
+  --moss: #8fa28c;
+  --moss-2: #6f846c;
+  --mist: #d9ded8;
+  --ease: cubic-bezier(.2, .78, .22, 1);
+
+  --font-display: "Newsreader", "Times New Roman", serif;
+  --font-body: "Manrope", system-ui, sans-serif;
+  --font-outlier: "Manrope", system-ui, sans-serif;
+  --font-script: "WindSong", cursive;
+
+  --color-paper: var(--ivory);
+  --color-paper-2: var(--ivory-2);
+  --color-paper-3: var(--ivory-3);
+  --color-ink: var(--pine);
+  --color-ink-2: #2f3f3a;
+  --color-muted: #5b6a64;
+  --color-rule: rgb(19 32 29 / 0.14);
+  --color-rule-ink: var(--pine);
+  --color-accent: var(--pine-2);
+  --color-accent-2: var(--pine-3);
+  --color-accent-ink: var(--ivory);
+  --color-focus: #4f6b5f;
+  --color-night: var(--pine);
+  --color-night-2: var(--pine-2);
+  --color-on-night: var(--ivory);
+  --color-on-night-muted: rgb(245 240 228 / 0.72);
+  --color-booked: #6f7d72;
+  --color-blocked: #cfd5c9;
+  --tracking-display: -0.01em;
+}
+
+body { background: var(--pine); color: var(--color-ink); font-family: var(--font-body); }
+h1, h2, h3 { font-family: var(--font-display); font-weight: 300; letter-spacing: -0.012em; }
+.num { font-family: var(--font-body); font-variant-numeric: tabular-nums; letter-spacing: 0; }

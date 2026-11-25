@@ -1,0 +1,202 @@
+import type { Lang } from "@/lib/types";
+
+/** Textos de la experiencia cinemática (capítulos, galería, tres noches, panel). */
+const es = {
+  loader: "Preparando el bosque",
+  cue: "Deslizá",
+  reserve: "Reservar estadía",
+  discover: "Descubrir",
+  rail: ["Llegada", "Sedes", "Cabañas", "Adentro", "Noche", "Elegí", "Tres noches", "Fechas", "Mascotas", "Llegar"],
+  hero: {
+    a: "Despertá entre",
+    script: "el bosque",
+    b: "y el mar",
+    sub: "Cabañas A-frame en La Pedrera, Rocha. Dos sedes, naturaleza y calma. Reservá directo, sin comisiones.",
+  },
+  sedes: {
+    n: "02",
+    label: "Dos sedes",
+    title: "Del pueblo al bosque, tres minutos",
+    body: "La Pedrera, cerca del centro y de la costa. San Sebastián, en un bosque de eucaliptos a ~1 km. Elegí la que vaya con tu escapada.",
+    path: ["La Pedrera", "~1 km", "San Sebastián"],
+  },
+  cabins: {
+    n: "03",
+    label: "Las cabañas",
+    title: "Madera, vidrio y silencio",
+    body: "Cinco cabañas pensadas para parejas, con todo para cocinar y quedarse.",
+    from: "desde",
+    night: "/ noche",
+    more: "Ver las cabañas",
+  },
+  inside: {
+    n: "04",
+    label: "Adentro",
+    title: "Fuego encendido, nada que hacer",
+    body: "Salamandra a leña, cocina equipada y un deck propio. Es solo alojamiento: sin restaurante, a tu ritmo.",
+  },
+  night: {
+    n: "05",
+    label: "La noche",
+    title: "Un cielo sin luces de ciudad",
+    body: "Lejos del ruido, las noches de Rocha son para mirar arriba. Y tu perro también viene: somos pet friendly.",
+  },
+  chronicle: {
+    n: "06",
+    label: "Una por una",
+    title: "Elegí tu cabaña",
+    hint: "Tocá una cabaña para verla por dentro.",
+    flipBack: "Ver por fuera",
+    flipFront: "Ver por dentro",
+    guests: (n: number) => `Hasta ${n} huéspedes`,
+    book: "Reservar esta cabaña",
+  },
+  passage: {
+    n: "07",
+    label: "Tres noches en Calma",
+    title: "Una escapada de tres noches",
+    items: (checkIn: string) => [
+      { k: "Noche uno", t: "Llegar y encender el fuego", d: `Check-in desde las ${checkIn}, leña en la salamandra y la primera cena en la cabaña.` },
+      { k: "Noche dos", t: "La playa a la hora azul", d: "Caminar la costa de La Pedrera al atardecer y volver por el bosque." },
+      { k: "Noche tres", t: "Contar estrellas", d: "Sin luces de ciudad, el cielo de Rocha hace el resto." },
+    ],
+    seal: "Calma",
+    cta: "Reservar tres noches",
+  },
+  panel: { title: "Reservá tu estadía", close: "Cerrar reserva" },
+};
+
+export type Cine = typeof es;
+
+const en: Cine = {
+  loader: "Preparing the forest",
+  cue: "Scroll",
+  reserve: "Book your stay",
+  discover: "Discover",
+  rail: ["Arrival", "Locations", "Cabins", "Inside", "Night", "Choose", "Three nights", "Dates", "Pets", "Getting here"],
+  hero: {
+    a: "Wake up between",
+    script: "the forest",
+    b: "and the sea",
+    sub: "A-frame cabins in La Pedrera, Uruguay. Two locations, nature and calm. Book direct, zero commission.",
+  },
+  sedes: {
+    n: "02",
+    label: "Two locations",
+    title: "From village to forest in three minutes",
+    body: "La Pedrera, close to the centre and the coast. San Sebastián, in a eucalyptus forest about 1 km away. Pick the one that suits your escape.",
+    path: ["La Pedrera", "~1 km", "San Sebastián"],
+  },
+  cabins: {
+    n: "03",
+    label: "The cabins",
+    title: "Wood, glass and silence",
+    body: "Five cabins made for couples, with everything to cook and stay a while.",
+    from: "from",
+    night: "/ night",
+    more: "See the cabins",
+  },
+  inside: {
+    n: "04",
+    label: "Inside",
+    title: "Fire on, nothing to do",
+    body: "Wood-burning stove, equipped kitchen and a private deck. Lodging only: no restaurant, at your own pace.",
+  },
+  night: {
+    n: "05",
+    label: "Night",
+    title: "A sky without city lights",
+    body: "Far from the noise, nights in Rocha are for looking up. And your dog is coming too: we're pet friendly.",
+  },
+  chronicle: {
+    n: "06",
+    label: "One by one",
+    title: "Choose your cabin",
+    hint: "Tap a cabin to see inside.",
+    flipBack: "See outside",
+    flipFront: "See inside",
+    guests: (n: number) => `Up to ${n} guests`,
+    book: "Book this cabin",
+  },
+  passage: {
+    n: "07",
+    label: "Three nights at Calma",
+    title: "A three-night escape",
+    items: (checkIn: string) => [
+      { k: "Night one", t: "Arrive and light the fire", d: `Check-in from ${checkIn}, logs in the stove and a first dinner in the cabin.` },
+      { k: "Night two", t: "The beach at blue hour", d: "Walk La Pedrera's coast at sunset and head back through the forest." },
+      { k: "Night three", t: "Counting stars", d: "No city lights: Rocha's sky does the rest." },
+    ],
+    seal: "Calma",
+    cta: "Book three nights",
+  },
+  panel: { title: "Book your stay", close: "Close booking" },
+};
+
+const pt: Cine = {
+  loader: "Preparando a mata",
+  cue: "Role",
+  reserve: "Reservar estadia",
+  discover: "Descobrir",
+  rail: ["Chegada", "Sedes", "Cabanas", "Por dentro", "Noite", "Escolha", "Três noites", "Datas", "Pets", "Como chegar"],
+  hero: {
+    a: "Acorde entre",
+    script: "a mata",
+    b: "e o mar",
+    sub: "Cabanas A-frame em La Pedrera, Uruguai. Duas sedes, natureza e calma. Reserve direto, sem comissão.",
+  },
+  sedes: {
+    n: "02",
+    label: "Duas sedes",
+    title: "Da vila à mata, três minutos",
+    body: "La Pedrera, perto do centro e da costa. San Sebastián, numa mata de eucaliptos a ~1 km. Escolha a que combina com a sua escapada.",
+    path: ["La Pedrera", "~1 km", "San Sebastián"],
+  },
+  cabins: {
+    n: "03",
+    label: "As cabanas",
+    title: "Madeira, vidro e silêncio",
+    body: "Cinco cabanas pensadas para casais, com tudo para cozinhar e ficar.",
+    from: "a partir de",
+    night: "/ noite",
+    more: "Ver as cabanas",
+  },
+  inside: {
+    n: "04",
+    label: "Por dentro",
+    title: "Fogo aceso, nada para fazer",
+    body: "Lareira a lenha, cozinha equipada e um deck privativo. É só hospedagem: sem restaurante, no seu ritmo.",
+  },
+  night: {
+    n: "05",
+    label: "A noite",
+    title: "Um céu sem luzes da cidade",
+    body: "Longe do barulho, as noites de Rocha são para olhar para cima. E seu cachorro também vem: somos pet friendly.",
+  },
+  chronicle: {
+    n: "06",
+    label: "Uma por uma",
+    title: "Escolha sua cabana",
+    hint: "Toque numa cabana para ver por dentro.",
+    flipBack: "Ver por fora",
+    flipFront: "Ver por dentro",
+    guests: (n: number) => `Até ${n} hóspedes`,
+    book: "Reservar esta cabana",
+  },
+  passage: {
+    n: "07",
+    label: "Três noites na Calma",
+    title: "Uma escapada de três noites",
+    items: (checkIn: string) => [
+      { k: "Noite um", t: "Chegar e acender o fogo", d: `Check-in a partir das ${checkIn}, lenha na lareira e o primeiro jantar na cabana.` },
+      { k: "Noite dois", t: "A praia na hora azul", d: "Caminhar pela costa de La Pedrera ao entardecer e voltar pela mata." },
+      { k: "Noite três", t: "Contar estrelas", d: "Sem luzes da cidade, o céu de Rocha faz o resto." },
+    ],
+    seal: "Calma",
+    cta: "Reservar três noites",
+  },
+  panel: { title: "Reserve sua estadia", close: "Fechar reserva" },
+};
+
+const ALL: Record<Lang, Cine> = { es, en, pt };
+export const cine = (lang: Lang): Cine => ALL[lang];

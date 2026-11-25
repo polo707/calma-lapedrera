@@ -3,10 +3,19 @@ import "@fontsource/libre-caslon-display/400.css";
 import "@fontsource/hanken-grotesk/400.css";
 import "@fontsource/hanken-grotesk/500.css";
 import "@fontsource/dm-mono/400.css";
+import "@fontsource/newsreader/300.css";
+import "@fontsource/newsreader/400.css";
+import "@fontsource/newsreader/400-italic.css";
+import "@fontsource/manrope/400.css";
+import "@fontsource/manrope/500.css";
+import "@fontsource/manrope/600.css";
+import "@fontsource/windsong/400.css";
 import "./globals.css";
 import "./styles/hero.css";
 import "./styles/sections.css";
 import "./styles/booking.css";
+import "./styles/theme.css";
+import "./styles/cine.css";
 import { LangProvider } from "@/i18n/LangProvider";
 
 export const metadata: Metadata = {
@@ -26,7 +35,7 @@ export const metadata: Metadata = {
 export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
-  themeColor: "#f3eee4",
+  themeColor: "#13201d",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

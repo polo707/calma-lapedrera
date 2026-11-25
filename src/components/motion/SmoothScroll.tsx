@@ -20,7 +20,7 @@ export function getLenis(): Lenis | null {
   return lenis;
 }
 
-const NATIVE_SCROLL = ".chat, .chat__body, .chat__backdrop, .board, .menu, [role='dialog'], [data-lenis-prevent]";
+const NATIVE_SCROLL = ".chat, .chat__body, .chat__backdrop, .board, .menu, .bpanel, .gallery-track, [role='dialog'], [data-lenis-prevent]";
 
 function navHeight(): number {
   const v = parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--nav-h"));

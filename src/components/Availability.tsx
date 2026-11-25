@@ -35,7 +35,7 @@ export function Availability() {
   function pick(cabinId: string, iso: string) {
     setTipOn(false);
     window.dispatchEvent(new CustomEvent<Prefill>(PREFILL_EVENT, { detail: { cabinId, checkIn: iso } }));
-    document.getElementById("reservar")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    window.dispatchEvent(new Event("calma:book-open"));
   }
 
   function shift(delta: number) {

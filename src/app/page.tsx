@@ -1,25 +1,32 @@
-import { Header } from "@/components/Header";
-import { Hero } from "@/components/Hero";
-import { Sedes, Cabins, Entorno, Pets, Location, Footer } from "@/components/Sections";
 import { Availability } from "@/components/Availability";
-import { BookingSection } from "@/components/BookingSection";
+import { Pets, Location, Footer } from "@/components/Sections";
 import { ChatWidget } from "@/chat/ChatWidget";
+import { Loader } from "@/cine/Loader";
+import { Stage } from "@/cine/Stage";
+import { SiteHeader } from "@/cine/SiteHeader";
+import { Chapters } from "@/cine/Chapters";
+import { Chronicle } from "@/cine/Chronicle";
+import { Passage } from "@/cine/Passage";
+import { BookingPanel } from "@/cine/BookingPanel";
 
 export default function Home() {
   return (
     <>
-      <Header />
-      <main>
-        <Hero />
-        <Sedes />
-        <Cabins />
-        <Availability />
-        <BookingSection />
-        <Entorno />
-        <Pets />
-        <Location />
+      <Loader />
+      <Stage />
+      <SiteHeader />
+      <main className="cine-main">
+        <Chapters />
+        <Chronicle />
+        <Passage />
+        <div className="paper">
+          <div data-chapter="7" data-tone="light"><Availability /></div>
+          <div data-chapter="8" data-tone="light"><Pets /></div>
+          <div data-chapter="9" data-tone="light"><Location /></div>
+        </div>
       </main>
-      <Footer />
+      <div data-tone="light" className="paper paper--footer"><Footer /></div>
+      <BookingPanel />
       <ChatWidget />
     </>
   );
