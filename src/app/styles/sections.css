@@ -263,8 +263,8 @@ html:not(.js) .sx-sedes__panel + .sx-sedes__panel { margin-top: var(--space-2xl)
 
 .sx-pets__frame { position: relative; margin: 0; overflow: hidden; aspect-ratio: 4 / 5; background: var(--color-night); }
 /* La foto va a 2x dentro del marco, con el perro (54% / 77% del original) cerca del centro. */
-.sx-pets__zoom { position: absolute; left: -50%; top: -72%; width: 185%; height: 185%; transform-origin: 54% 72%; }
-.sx-pets__zoom img { object-fit: cover; }
+.sx-pets__zoom { position: absolute; inset: 0; transform-origin: 55% 45%; }
+.sx-pets__zoom img { object-fit: cover; object-position: 55% 50%; }
 
 .sx-pets__figs { margin: 0; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); border-top: var(--rule-ink) solid var(--color-rule-ink); border-bottom: 1px solid var(--color-rule); }
 .sx-pets__fig { display: flex; flex-direction: column-reverse; justify-content: flex-end; gap: var(--space-xs); padding: var(--space-lg) var(--space-md) var(--space-lg) 0; min-width: 0; }

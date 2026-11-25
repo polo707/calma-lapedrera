@@ -88,7 +88,7 @@ export const sectionsExtra: Record<Lang, Extra> = {
       items: ["La playa, a la hora azul", "El cielo sin luces de ciudad", "Hojas del monte, a la sombra"],
     },
     pets: {
-      alt: "Un perro sentado en el deck de una cabaña A-frame, de noche",
+      alt: "Un perro descansando en el sillón de una cabaña",
       maxLabel: "mascotas por cabaña",
       feeLabel: "cargo único de limpieza",
       perStay: "por estadía",
@@ -144,7 +144,7 @@ export const sectionsExtra: Record<Lang, Extra> = {
       items: ["The beach at blue hour", "A sky without city lights", "Leaves in the shade of the woods"],
     },
     pets: {
-      alt: "A dog sitting on the deck of an A-frame cabin at night",
+      alt: "A dog resting on the sofa of a cabin",
       maxLabel: "pets per cabin",
       feeLabel: "one-off cleaning fee",
       perStay: "per stay",
@@ -200,7 +200,7 @@ export const sectionsExtra: Record<Lang, Extra> = {
       items: ["A praia na hora azul", "O céu sem luzes da cidade", "Folhas da mata, na sombra"],
     },
     pets: {
-      alt: "Um cachorro sentado no deck de uma cabana A-frame, à noite",
+      alt: "Um cachorro descansando no sofá de uma cabana",
       maxLabel: "pets por cabana",
       feeLabel: "taxa única de limpeza",
       perStay: "por estadia",

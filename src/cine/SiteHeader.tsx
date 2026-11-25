@@ -7,7 +7,7 @@ import { SmoothScroll, scrollToHash } from "@/components/motion/SmoothScroll";
 import { useCine } from "./scroll";
 import { ReserveButton } from "./ReserveButton";
 
-export const CHAPTER_IDS = ["top", "sedes", "cabanas", "adentro", "noche", "cronica", "tres-noches", "disponibilidad", "mascotas", "como-llegar"];
+export const CHAPTER_IDS = ["top", "sedes", "cabanas", "adentro", "noche", "cronica", "tres-noches", "espacio", "galeria", "disponibilidad", "mascotas", "como-llegar"];
 
 export function SiteHeader() {
   const { lang, setLang, d } = useLang();
@@ -28,7 +28,8 @@ export function SiteHeader() {
           <a href="#cronica">{d.nav.cabins}</a>
           <a href="#disponibilidad">{d.nav.availability}</a>
           <a href="#mascotas">{d.nav.pet}</a>
-          <a href="#como-llegar">{c.rail[9]}</a>
+          <a href="#galeria">{c.gallery.label}</a>
+          <a href="#como-llegar">{c.rail[c.rail.length - 1]}</a>
         </nav>
         <div className="site-header__end">
           <div className="site-header__lang" role="group" aria-label={d.nav.lang}>

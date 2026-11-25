@@ -8,13 +8,13 @@ import { addDays, todayISO } from "./dates";
 export function seedData(): Data {
   const t = todayISO();
   return {
-    version: 2,
+    version: 3,
     cabins: [
-      { id: "agua", sedeId: "pedrera", name: "Agua", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/puerta-agua.jpg", kind: "aframe" },
-      { id: "tierra", sedeId: "pedrera", name: "Tierra", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/aframe-dia-deck.jpg", kind: "aframe" },
-      { id: "aire", sedeId: "sansebastian", name: "Aire", capacity: 3, rateLow: 105, rateHigh: 145, photo: "/photos/aframe-luces.jpg", kind: "aframe" },
+      { id: "agua", sedeId: "sansebastian", name: "Agua", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/puerta-agua.jpg", kind: "aframe" },
+      { id: "tierra", sedeId: "sansebastian", name: "Tierra", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/aframe-dia-deck.jpg", kind: "aframe" },
+      { id: "aire", sedeId: "sansebastian", name: "Aire", capacity: 2, rateLow: 95, rateHigh: 130, photo: "/photos/aframe-luces.jpg", kind: "aframe" },
       { id: "fuego", sedeId: "pedrera", name: "Fuego", capacity: 2, rateLow: 90, rateHigh: 125, photo: "/photos/aframe-entre-arboles.jpg", kind: "aframe" },
-      { id: "bosque", sedeId: "sansebastian", name: "Bosque", capacity: 4, rateLow: 110, rateHigh: 150, photo: "/photos/cabana-bosque.jpg", kind: "box" },
+      { id: "bosque", sedeId: "pedrera", name: "Bosque", capacity: 4, rateLow: 110, rateHigh: 150, photo: "/photos/cabana-bosque.jpg", kind: "box" },
     ],
     settings: {
       depositPct: 30,
@@ -39,7 +39,7 @@ export function seedData(): Data {
       },
       {
         id: "demo-2", code: "CLM-4F7K", cabinId: "aire", checkIn: addDays(t, 6), checkOut: addDays(t, 8),
-        guests: 3, pet: false, name: "Mariana (exemplo)", phone: "5511988887777", total: 210, deposit: 63,
+        guests: 2, pet: false, name: "Mariana (exemplo)", phone: "5511988887777", total: 210, deposit: 63,
         status: "pending", source: "chat", lang: "pt", createdAt: new Date().toISOString(), demo: true,
       },
       {

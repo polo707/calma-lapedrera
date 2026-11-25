@@ -15,7 +15,7 @@ export const SITE_NAME = "Calma La Pedrera";
 export const CURRENCY = "USD";
 
 /** Clave de localStorage donde vive la fuente de datos compartida (web + chat + admin). */
-export const STORAGE_KEY = "calma.data.v2";
+export const STORAGE_KEY = "calma.data.v3";
 export const LANG_KEY = "calma.lang";
 
 /** Link exacto de Google Maps que pasó el cliente (botón "Abrir en Google Maps"). */

@@ -7,6 +7,8 @@ import { SiteHeader } from "@/cine/SiteHeader";
 import { Chapters } from "@/cine/Chapters";
 import { Chronicle } from "@/cine/Chronicle";
 import { Passage } from "@/cine/Passage";
+import { Gallery } from "@/cine/Gallery";
+import { Space } from "@/cine/Space";
 import { BookingPanel } from "@/cine/BookingPanel";
 
 export default function Home() {
@@ -19,10 +21,12 @@ export default function Home() {
         <Chapters />
         <Chronicle />
         <Passage />
+        <Space />
+        <Gallery />
         <div className="paper">
-          <div data-chapter="7" data-tone="light"><Availability /></div>
-          <div data-chapter="8" data-tone="light"><Pets /></div>
-          <div data-chapter="9" data-tone="light"><Location /></div>
+          <div data-chapter="9" data-tone="light"><Availability /></div>
+          <div data-chapter="10" data-tone="light"><Pets /></div>
+          <div data-chapter="11" data-tone="light"><Location /></div>
         </div>
       </main>
       <div data-tone="light" className="paper paper--footer"><Footer /></div>

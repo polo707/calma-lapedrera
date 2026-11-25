@@ -9,7 +9,7 @@ import { useData } from "@/lib/store";
 import { Reveal } from "@/components/motion/Reveal";
 import { IconArrow, pad2 } from "./shared";
 
-import fotoPerro from "../../../public/photos/aframe-noche-perro.jpg";
+import fotoPerro from "../../../public/photos/perro-sillon.jpg";
 
 /**
  * Mascotas: retrato del perro (recorte cerrado de la foto del hero: la imagen va a 2x dentro
@@ -24,7 +24,7 @@ export function Pets() {
 
   const frame = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({ target: frame, offset: ["start end", "end start"] });
-  const scale = useTransform(scrollYProgress, [0, 1], [1.16, 1]);
+  const scale = useTransform(scrollYProgress, [0, 1], [1.1, 1]);
 
   return (
     <section className="section section--tint sx-pets" id="mascotas" aria-labelledby="pet-title">
@@ -41,7 +41,7 @@ export function Pets() {
         <div ref={frame} className="sx-pets__media">
           <Reveal as="figure" variant="mask" className="sx-pets__frame">
             <motion.div className="sx-pets__zoom plx" style={{ scale }}>
-              <Image src={fotoPerro} alt={x.alt} placeholder="blur" fill sizes="(max-width: 60rem) 200vw, 90vw" />
+              <Image src={fotoPerro} alt={x.alt} placeholder="blur" fill sizes="(max-width: 60rem) 100vw, 45vw" />
             </motion.div>
           </Reveal>
         </div>
